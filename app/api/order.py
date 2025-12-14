@@ -31,6 +31,7 @@ def get_internal_orders(
     sparePartLocation: str = None,
     dateRange: list = None,
     createdBy: int = None,
+    projectType: str = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
@@ -86,6 +87,9 @@ def get_internal_orders(
                     internal_order_crud.model.report_date >= start_date,
                     internal_order_crud.model.report_date <= end_date,
                 )
+
+        if projectType:
+            query = query.filter(internal_order_crud.model.project_type == projectType)
 
         # 获取总数
         total = query.count()
