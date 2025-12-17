@@ -40,6 +40,7 @@ class ExternalOrderBase(CamelCaseModel):
     reporter_name: str
     contact_info: str
     report_date: date
+    project_type: str
     insurer: str
     assessor: str
     license_plate: Optional[str] = None
@@ -185,6 +186,7 @@ class ExternalOrderUpdate(CamelCaseModel):
     reporter_name: Optional[str] = None
     contact_info: Optional[str] = None
     report_date: Optional[date] = None
+    project_type: Optional[str] = None
     insurer: Optional[str] = None
     assessor: Optional[str] = None
     license_plate: Optional[str] = None
@@ -346,6 +348,7 @@ class ExternalOrderResponse(CamelCaseModel):
     reporter_name: str
     contact_info: str
     report_date: date
+    project_type: str
     insurer: str
     assessor: str
     license_plate: Optional[str] = None

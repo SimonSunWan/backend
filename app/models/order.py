@@ -92,6 +92,7 @@ class ExternalOrder(Base, TimestampMixin):
     reporter_name = Column(String, nullable=False)
     contact_info = Column(String, nullable=False)
     report_date = Column(Date, nullable=False)
+    project_type = Column(String, nullable=False)  # 项目类型
     insurer = Column(String, nullable=False)
     assessor = Column(String, nullable=False)
     license_plate = Column(String)
