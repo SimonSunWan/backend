@@ -8,6 +8,7 @@ from .order import InternalOrder, InternalOrderDetail, ExternalOrder, ExternalOr
 from .department import Department, UserDepartment, DepartmentLeader
 from .user_role import user_role
 from .role_menu import role_menu
+from .repair_project import RepairProject
 
 __all__ = [
     "User",
@@ -24,5 +25,6 @@ __all__ = [
     "UserDepartment",
     "DepartmentLeader",
     "user_role",
-    "role_menu"
+    "role_menu",
+    "RepairProject"
 ]

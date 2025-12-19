@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api import auth, cache, department, dictionary, menu, order, role, system, user
+from app.api import auth, cache, department, dictionary, menu, order, repair_project, role, system, user
 
 api_router = APIRouter()
 
@@ -13,6 +13,7 @@ ROUTES = [
     (menu.router, "/menus", ["menus"]),
     (department.router, "/departments", ["departments"]),
     (order.router, "/orders", ["orders"]),
+    (repair_project.router, "/repair", ["repair-projects"]),
     (system.router, "/system", ["system-settings"]),
     (cache.router, "/cache", ["cache"])
 ]
