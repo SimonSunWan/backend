@@ -14,7 +14,7 @@ class CRUDBase(Generic[ModelType]):
     def __init__(self, model: Type[ModelType]):
         self.model = model
 
-    def get(self, db: Session, id: int) -> Optional[ModelType]:
+    def get(self, db: Session, id: str) -> Optional[ModelType]:
         """根据 ID 获取单个记录"""
         return db.query(self.model).filter(self.model.id == id).first()
 
@@ -39,7 +39,7 @@ class CRUDBase(Generic[ModelType]):
         return db_obj
 
     def get_or_404(
-        self, db: Session, id: int, error_message: str = "记录未找到"
+        self, db: Session, id: str, error_message: str = "记录未找到"
     ) -> ModelType:
         """获取记录，如果不存在则返回 404 错误"""
         obj = self.get(db, id)
@@ -62,6 +62,13 @@ class CRUDBase(Generic[ModelType]):
         """删除记录"""
         db.delete(db_obj)
         db.commit()
+        
+    def remove(self, db: Session, id: str) -> None:
+        """根据ID删除记录"""
+        obj = self.get(db, id)
+        if obj:
+            db.delete(obj)
+            db.commit()
 
     def count(self, db: Session, filters: Optional[Dict[str, Any]] = None) -> int:
         """统计记录数量"""

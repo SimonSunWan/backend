@@ -164,13 +164,20 @@ def delete_repair_project(
     current_user: User = Depends(get_current_active_user),
 ):
     """删除维修项目"""
-    db_repair_project = repair_project_crud.get(db, id=repair_project_id)
-    if not db_repair_project:
-        raise HTTPException(status_code=404, detail="维修项目不存在")
-    
-    repair_project_crud.remove(db, id=repair_project_id)
-    
-    return ApiResponse(message="删除维修项目成功")
+    try:
+        db_repair_project = repair_project_crud.get(db, id=repair_project_id)
+        if not db_repair_project:
+            raise HTTPException(status_code=404, detail="维修项目不存在")
+        
+        repair_project_crud.remove(db, id=repair_project_id)
+        
+        return ApiResponse(message="删除维修项目成功")
+    except HTTPException:
+        raise  # 重新抛出HTTPException
+    except Exception as e:
+        # 捕获其他异常并返回500错误
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"删除维修项目失败: {str(e)}")
 
 
 @router.delete("/batch", response_model=ApiResponse[dict])
@@ -180,19 +187,26 @@ def batch_delete_repair_projects(
     current_user: User = Depends(get_current_active_user),
 ):
     """批量删除维修项目"""
-    if not ids:
-        raise HTTPException(status_code=400, detail="请提供要删除的维修项目ID列表")
-    
-    # 检查所有项目是否存在
-    existing_projects = db.query(RepairProject).filter(RepairProject.id.in_(ids)).all()
-    if len(existing_projects) != len(ids):
-        raise HTTPException(status_code=404, detail="部分维修项目不存在")
-    
-    # 批量删除
-    db.query(RepairProject).filter(RepairProject.id.in_(ids)).delete(synchronize_session=False)
-    db.commit()
-    
-    return ApiResponse(message=f"批量删除维修项目成功，共删除{len(ids)}个")
+    try:
+        if not ids:
+            raise HTTPException(status_code=400, detail="请提供要删除的维修项目ID列表")
+        
+        # 检查所有项目是否存在
+        existing_projects = db.query(RepairProject).filter(RepairProject.id.in_(ids)).all()
+        if len(existing_projects) != len(ids):
+            raise HTTPException(status_code=404, detail="部分维修项目不存在")
+        
+        # 批量删除
+        db.query(RepairProject).filter(RepairProject.id.in_(ids)).delete(synchronize_session=False)
+        db.commit()
+        
+        return ApiResponse(message=f"批量删除维修项目成功，共删除{len(ids)}个")
+    except HTTPException:
+        raise  # 重新抛出HTTPException
+    except Exception as e:
+        # 捕获其他异常并返回500错误
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"批量删除维修项目失败: {str(e)}")
 
 
 @router.get("/export", response_class=StreamingResponse)
