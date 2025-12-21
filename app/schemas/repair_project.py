@@ -10,7 +10,7 @@ class RepairProjectBase(BaseModel):
     repair_project_code: str = Field(..., description="维修项目代码")
     fault_location_name: str = Field(..., description="故障位置")
     repair_project_name: str = Field(..., description="维修项目名称")
-    coefficient: float = Field(..., description="工时系数")
+    coefficient: str = Field(..., description="工时系数")
     remark: Optional[str] = Field(None, description="备注")
 
 
@@ -25,7 +25,7 @@ class RepairProjectUpdate(BaseModel):
     repair_project_code: Optional[str] = Field(None, description="维修项目代码")
     fault_location_name: Optional[str] = Field(None, description="故障位置")
     repair_project_name: Optional[str] = Field(None, description="维修项目名称")
-    coefficient: Optional[float] = Field(None, description="工时系数")
+    coefficient: Optional[str] = Field(None, description="工时系数")
     remark: Optional[str] = Field(None, description="备注")
 
 

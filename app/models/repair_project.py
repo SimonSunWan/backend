@@ -14,5 +14,5 @@ class RepairProject(Base, TimestampMixin):
     repair_project_code = Column(String(100), nullable=False, comment="维修项目代码")
     fault_location_name = Column(String(50), nullable=False, comment="故障位置")
     repair_project_name = Column(String(200), nullable=False, comment="维修项目名称")
-    coefficient = Column(Float, nullable=False, comment="工时系数")
+    coefficient = Column(String(50), nullable=False, comment="工时系数")
     remark = Column(Text, comment="备注")
