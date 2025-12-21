@@ -17,8 +17,8 @@ def is_department_leader(user: User, db: Session) -> bool:
 
 
 def get_department_member_ids(db: Session, user: User) -> List[int]:
-    """获取用户负责的部门下的所有成员ID列表"""
-    from app.models.department import UserDepartment
+    """获取用户负责的部门及其所有子部门下的成员ID列表"""
+    from app.models.department import UserDepartment, Department
     
     # 获取用户负责的部门ID列表
     leading_dept_ids = [dept.id for dept in user.leading_departments if dept.status]
@@ -26,9 +26,28 @@ def get_department_member_ids(db: Session, user: User) -> List[int]:
     if not leading_dept_ids:
         return []
     
+    # 获取所有子部门的ID（递归查询）
+    all_dept_ids = []
+    
+    # 使用递归函数获取所有子部门ID
+    def get_all_child_dept_ids(parent_ids: List[int]):
+        all_dept_ids.extend(parent_ids)
+        
+        # 查询这些部门下的所有直接子部门
+        child_depts = db.query(Department.id).filter(
+            Department.parent_id.in_(parent_ids),
+            Department.status == True
+        ).all()
+        
+        child_ids = [dept.id for dept in child_depts]
+        if child_ids:
+            get_all_child_dept_ids(child_ids)
+    
+    get_all_child_dept_ids(leading_dept_ids)
+    
     # 获取这些部门下的所有成员ID
     user_ids = db.query(UserDepartment.user_id).filter(
-        UserDepartment.dept_id.in_(leading_dept_ids),
+        UserDepartment.dept_id.in_(all_dept_ids),
         UserDepartment.is_active == True
     ).all()
     
