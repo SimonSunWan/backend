@@ -51,7 +51,14 @@ def get_department_member_ids(db: Session, user: User) -> List[int]:
         UserDepartment.is_active == True
     ).all()
     
-    return [user_id[0] for user_id in user_ids]
+    # 获取所有成员ID，包括部门负责人自己
+    member_ids = [user_id[0] for user_id in user_ids]
+    
+    # 确保包含当前用户自己的ID（因为部门负责人可能在查询中被遗漏）
+    if user.id not in member_ids:
+        member_ids.append(user.id)
+    
+    return member_ids
 
 
 def get_order_permission_filter(user: User, db: Session):

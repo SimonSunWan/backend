@@ -284,6 +284,8 @@ class InternalOrderResponse(CamelCaseModel):
     order_progress: Optional[str] = None
     avic_order_number: Optional[str] = None
     is_end: bool = False
+    created_by: Optional[int] = None
+    created_name: Optional[str] = None
     create_time: datetime
     update_time: Optional[datetime] = None
     # 详情记录
@@ -363,6 +365,8 @@ class ExternalOrderResponse(CamelCaseModel):
     fault_description: Optional[str] = None
     order_progress: Optional[str] = None
     is_end: bool = False
+    created_by: Optional[int] = None
+    created_name: Optional[str] = None
     create_time: datetime
     update_time: Optional[datetime] = None
     # 详情记录

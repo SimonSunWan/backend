@@ -104,7 +104,15 @@ def get_internal_orders(
             .all()
         )
         
-        # 构建响应数据，包含备件所属库位信息
+        # 获取创建者信息
+        creator_ids = list(set([order.created_by for order in orders if order.created_by is not None]))
+        creator_names = {}
+        if creator_ids:
+            from app.models.user import User
+            creators = db.query(User).filter(User.id.in_(creator_ids)).all()
+            creator_names = {user.id: user.nick_name or user.user_name for user in creators}
+        
+        # 构建响应数据，包含备件所属库位信息和创建者信息
         order_responses = []
         for order in orders:
             order_dict = InternalOrderResponse.model_validate(order).model_dump()
@@ -113,6 +121,9 @@ def get_internal_orders(
                 order_dict['sparePartLocation'] = order.details[0].spare_part_location
             else:
                 order_dict['sparePartLocation'] = None
+            # 添加创建者信息（使用驼峰命名法）
+            order_dict['createdBy'] = order.created_by
+            order_dict['createdName'] = creator_names.get(order.created_by) if order.created_by else None
             order_responses.append(order_dict)
 
         # 返回包含分页信息的响应
@@ -179,8 +190,22 @@ def get_internal_order(order_id: str, db: Session = Depends(get_db)):
         order = internal_order_crud.get_with_details(db, order_id)
         if not order:
             raise HTTPException(status_code=404, detail="保内工单未找到")
+        
+        # 查询创建者信息
+        if order.created_by:
+            from app.models.user import User
+            creator = db.query(User).filter(User.id == order.created_by).first()
+            created_name = creator.nick_name or creator.user_name if creator else None
+        else:
+            created_name = None
+        
+        # 构建响应数据
         order_response = InternalOrderResponse.model_validate(order)
-        return ApiResponse(data=order_response)
+        order_dict = order_response.model_dump()
+        order_dict['createdBy'] = order.created_by
+        order_dict['createdName'] = created_name
+        
+        return ApiResponse(data=order_dict)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取保内工单失败: {str(e)}")
 
@@ -325,9 +350,23 @@ def get_external_orders(
             .limit(size)
             .all()
         )
-        order_responses = [
-            ExternalOrderResponse.model_validate(order) for order in orders
-        ]
+        
+        # 获取创建者信息
+        creator_ids = list(set([order.created_by for order in orders if order.created_by is not None]))
+        creator_names = {}
+        if creator_ids:
+            from app.models.user import User
+            creators = db.query(User).filter(User.id.in_(creator_ids)).all()
+            creator_names = {user.id: user.nick_name or user.user_name for user in creators}
+        
+        # 构建响应数据，包含创建者信息
+        order_responses = []
+        for order in orders:
+            order_dict = ExternalOrderResponse.model_validate(order).model_dump()
+            # 添加创建者信息（使用驼峰命名法）
+            order_dict['createdBy'] = order.created_by
+            order_dict['createdName'] = creator_names.get(order.created_by) if order.created_by else None
+            order_responses.append(order_dict)
 
         # 返回包含分页信息的响应
         response_data = {
@@ -393,8 +432,22 @@ def get_external_order(order_id: str, db: Session = Depends(get_db)):
         order = external_order_crud.get_with_details(db, order_id)
         if not order:
             raise HTTPException(status_code=404, detail="保外工单未找到")
+        
+        # 查询创建者信息
+        if order.created_by:
+            from app.models.user import User
+            creator = db.query(User).filter(User.id == order.created_by).first()
+            created_name = creator.nick_name or creator.user_name if creator else None
+        else:
+            created_name = None
+        
+        # 构建响应数据
         order_response = ExternalOrderResponse.model_validate(order)
-        return ApiResponse(data=order_response)
+        order_dict = order_response.model_dump()
+        order_dict['createdBy'] = order.created_by
+        order_dict['createdName'] = created_name
+        
+        return ApiResponse(data=order_dict)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取保外工单失败: {str(e)}")
 
