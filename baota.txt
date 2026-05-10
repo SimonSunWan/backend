@@ -1,3 +1,3 @@
-https://8.135.237.19:29351/99861272
-username: fmgjvyjc
-password: ba68c3cf
+http://119.23.73.1:8888/login?spm=5176.swas-next_server-detail.0.0.16014ad8hGzcc8
+username: 72594032
+password: 9245dbe39b61
