@@ -4,11 +4,9 @@ from .role import Role
 from .menu import Menu
 from .dictionary import DictionaryType, DictionaryEnum
 from .system import SystemSetting
-from .order import InternalOrder, InternalOrderDetail, ExternalOrder, ExternalOrderDetail
 from .department import Department, UserDepartment, DepartmentLeader
 from .user_role import user_role
 from .role_menu import role_menu
-from .repair_project import RepairProject
 
 __all__ = [
     "User",
@@ -17,14 +15,9 @@ __all__ = [
     "DictionaryType",
     "DictionaryEnum",
     "SystemSetting",
-    "InternalOrder",
-    "InternalOrderDetail",
-    "ExternalOrder",
-    "ExternalOrderDetail",
     "Department",
     "UserDepartment",
     "DepartmentLeader",
     "user_role",
     "role_menu",
-    "RepairProject"
 ]

@@ -59,21 +59,3 @@ def get_department_member_ids(db: Session, user: User) -> List[int]:
         member_ids.append(user.id)
     
     return member_ids
-
-
-def get_order_permission_filter(user: User, db: Session):
-    """
-    根据用户权限返回工单数据过滤条件
-    
-    返回:
-    - 超级管理员: None (无过滤条件，查看所有数据)
-    - 部门负责人: 部门成员ID列表 (查看部门下所有成员的数据)
-    - 普通成员: 用户ID (只查看自己的数据)
-    """
-    if is_super_admin(user):
-        return None
-    
-    if is_department_leader(user, db):
-        return get_department_member_ids(db, user)
-    
-    return [user.id]

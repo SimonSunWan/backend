@@ -33,11 +33,6 @@ class Messages:
     ROLE_UPDATE_SUCCESS = "角色更新成功"
     ROLE_DELETE_SUCCESS = "角色删除成功"
 
-    # 工单相关
-    ORDER_CREATE_SUCCESS = "工单创建成功"
-    ORDER_UPDATE_SUCCESS = "工单更新成功"
-    ORDER_DELETE_SUCCESS = "工单删除成功"
-
     # 字典相关
     DICTIONARY_CREATE_SUCCESS = "字典创建成功"
     DICTIONARY_UPDATE_SUCCESS = "字典更新成功"
