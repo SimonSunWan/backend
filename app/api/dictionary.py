@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -191,7 +191,9 @@ def delete_dictionary_type(type_id: int, db: Session = Depends(get_db)):
 
 # 字典枚举相关接口
 @router.get("/enums", response_model=ApiResponse)
-def get_dictionary_enums(type_id: int, db: Session = Depends(get_db)):
+def get_dictionary_enums(
+    type_id: int = Query(..., alias="typeId"), db: Session = Depends(get_db)
+):
     """获取字典枚举列表"""
     try:
         tree = dictionary_enum_crud.build_cascade_tree(db, type_id)
@@ -212,7 +214,9 @@ def get_dictionary_enums(type_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/enums/root", response_model=ApiResponse)
-def get_root_dictionary_enums(type_id: int, db: Session = Depends(get_db)):
+def get_root_dictionary_enums(
+    type_id: int = Query(..., alias="typeId"), db: Session = Depends(get_db)
+):
     """获取根级字典枚举列表"""
     try:
         root_enums = dictionary_enum_crud.get_root_enums(db, type_id)

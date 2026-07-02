@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.database import get_db
@@ -60,7 +60,7 @@ def count_department_tree_nodes(tree):
 
 @router.get("/", response_model=ApiResponse)
 def get_departments(
-    dept_name: Optional[str] = None,
+    dept_name: Optional[str] = Query(None, alias="deptName"),
     status: Optional[bool] = None,
     db: Session = Depends(get_db),
 ):

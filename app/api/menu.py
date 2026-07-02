@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -104,7 +104,7 @@ def count_tree_nodes(tree):
 def get_menus(
     name: Optional[str] = None,
     path: Optional[str] = None,
-    menu_type: Optional[str] = None,
+    menu_type: Optional[str] = Query(None, alias="menuType"),
     db: Session = Depends(get_db),
 ):
     """获取菜单列表"""
