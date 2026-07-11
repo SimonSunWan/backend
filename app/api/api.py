@@ -1,19 +1,18 @@
 from fastapi import APIRouter
 
-from app.api import auth, cache, department, dictionary, menu, role, system, user
+from app.api import cache, department, dictionary, menu, role, system, user
 
 api_router = APIRouter()
 
 # 路由配置
 ROUTES = [
-    (auth.router, "/auth", ["auth"]),
-    (user.router, "/users", ["users"]),
+    (user.router, "/user", ["user"]),
     (dictionary.router, "/dictionary", ["dictionary"]),
-    (role.router, "/roles", ["roles"]),
-    (menu.router, "/menus", ["menus"]),
-    (department.router, "/departments", ["departments"]),
+    (role.router, "/role", ["role"]),
+    (menu.router, "/menu", ["menu"]),
+    (department.router, "/department", ["department"]),
     (system.router, "/system", ["system-settings"]),
-    (cache.router, "/cache", ["cache"])
+    (cache.router, "/cache", ["cache"]),
 ]
 
 for router, prefix, tags in ROUTES:

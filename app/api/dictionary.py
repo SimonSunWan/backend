@@ -19,7 +19,7 @@ router = APIRouter()
 
 
 # 字典类型相关接口
-@router.get("/types", response_model=ApiResponse)
+@router.get("/type", response_model=ApiResponse)
 def get_dictionary_types(
     current: int = 1, size: int = 10, name: str = None, db: Session = Depends(get_db)
 ):
@@ -112,7 +112,7 @@ def get_dictionary_by_code_public(code: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"获取字典数据失败: {str(e)}")
 
 
-@router.post("/types", response_model=ApiResponse)
+@router.post("/type", response_model=ApiResponse)
 def create_dictionary_type(
     type_data: DictionaryTypeCreate, db: Session = Depends(get_db)
 ):
@@ -124,7 +124,9 @@ def create_dictionary_type(
         if dictionary_type_crud.get_by_code(db, type_data.code):
             raise HTTPException(status_code=400, detail="字典类型编码已存在")
 
-        created_type = dictionary_type_crud.create(db, type_data.model_dump(by_alias=False))
+        created_type = dictionary_type_crud.create(
+            db, type_data.model_dump(by_alias=False)
+        )
         return ApiResponse(
             message="字典类型创建成功",
             data=DictionaryTypeResponse.model_validate(created_type),
@@ -135,7 +137,7 @@ def create_dictionary_type(
         raise HTTPException(status_code=500, detail=f"创建字典类型失败: {str(e)}")
 
 
-@router.get("/types/{type_id}", response_model=ApiResponse)
+@router.get("/type/{type_id}", response_model=ApiResponse)
 def get_dictionary_type(type_id: int, db: Session = Depends(get_db)):
     """获取单个字典类型"""
     try:
@@ -147,7 +149,7 @@ def get_dictionary_type(type_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"获取字典类型失败: {str(e)}")
 
 
-@router.put("/types/{type_id}", response_model=ApiResponse)
+@router.put("/type/{type_id}", response_model=ApiResponse)
 def update_dictionary_type(
     type_id: int, type_update: DictionaryTypeUpdate, db: Session = Depends(get_db)
 ):
@@ -176,7 +178,7 @@ def update_dictionary_type(
         raise HTTPException(status_code=500, detail=f"更新字典类型失败: {str(e)}")
 
 
-@router.delete("/types/{type_id}", response_model=ApiResponse)
+@router.delete("/type/{type_id}", response_model=ApiResponse)
 def delete_dictionary_type(type_id: int, db: Session = Depends(get_db)):
     """删除字典类型"""
     try:
@@ -190,7 +192,7 @@ def delete_dictionary_type(type_id: int, db: Session = Depends(get_db)):
 
 
 # 字典枚举相关接口
-@router.get("/enums", response_model=ApiResponse)
+@router.get("/enum", response_model=ApiResponse)
 def get_dictionary_enums(
     type_id: int = Query(..., alias="typeId"), db: Session = Depends(get_db)
 ):
@@ -213,7 +215,7 @@ def get_dictionary_enums(
         raise HTTPException(status_code=500, detail=f"获取字典枚举列表失败: {str(e)}")
 
 
-@router.get("/enums/root", response_model=ApiResponse)
+@router.get("/enum/root", response_model=ApiResponse)
 def get_root_dictionary_enums(
     type_id: int = Query(..., alias="typeId"), db: Session = Depends(get_db)
 ):
@@ -229,7 +231,7 @@ def get_root_dictionary_enums(
         raise HTTPException(status_code=500, detail=f"获取根级字典枚举失败: {str(e)}")
 
 
-@router.get("/enums/{parent_id}/children", response_model=ApiResponse)
+@router.get("/enum/{parent_id}/children", response_model=ApiResponse)
 def get_children_dictionary_enums(parent_id: int, db: Session = Depends(get_db)):
     """获取子级字典枚举列表"""
     try:
@@ -244,7 +246,7 @@ def get_children_dictionary_enums(parent_id: int, db: Session = Depends(get_db))
         raise HTTPException(status_code=500, detail=f"获取子级字典枚举失败: {str(e)}")
 
 
-@router.post("/enums", response_model=ApiResponse)
+@router.post("/enum", response_model=ApiResponse)
 def create_dictionary_enum(
     enum_data: DictionaryEnumCreate, db: Session = Depends(get_db)
 ):
@@ -287,7 +289,7 @@ def create_dictionary_enum(
         raise HTTPException(status_code=500, detail=f"创建字典枚举失败: {str(e)}")
 
 
-@router.get("/enums/{enum_id}", response_model=ApiResponse)
+@router.get("/enum/{enum_id}", response_model=ApiResponse)
 def get_dictionary_enum(enum_id: int, db: Session = Depends(get_db)):
     """获取单个字典枚举"""
     try:
@@ -299,7 +301,7 @@ def get_dictionary_enum(enum_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"获取字典枚举失败: {str(e)}")
 
 
-@router.put("/enums/{enum_id}", response_model=ApiResponse)
+@router.put("/enum/{enum_id}", response_model=ApiResponse)
 def update_dictionary_enum(
     enum_id: int, enum_update: DictionaryEnumUpdate, db: Session = Depends(get_db)
 ):
@@ -327,7 +329,7 @@ def update_dictionary_enum(
         raise HTTPException(status_code=500, detail=f"更新字典枚举失败: {str(e)}")
 
 
-@router.delete("/enums/{enum_id}", response_model=ApiResponse)
+@router.delete("/enum/{enum_id}", response_model=ApiResponse)
 def delete_dictionary_enum(enum_id: int, db: Session = Depends(get_db)):
     """删除字典枚举（级联删除子级）"""
     try:
@@ -339,19 +341,21 @@ def delete_dictionary_enum(enum_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"删除字典枚举失败: {str(e)}")
 
 
-@router.post("/enums/batch-import", response_model=ApiResponse)
+@router.post("/enum/batch-import", response_model=ApiResponse)
 def batch_import_dictionary_enums(
     request_data: BatchImportDictionaryEnumRequest, db: Session = Depends(get_db)
 ):
     """批量导入字典枚举"""
     try:
-        result = dictionary_enum_crud.batch_import(db, request_data.type_id, request_data.data)
+        result = dictionary_enum_crud.batch_import(
+            db, request_data.type_id, request_data.data
+        )
         return ApiResponse(data=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"批量导入失败: {str(e)}")
 
 
-@router.get("/enums/template/{type_id}")
+@router.get("/enum/template/{type_id}")
 def download_dictionary_enum_template(type_id: int, db: Session = Depends(get_db)):
     """下载字典枚举导入模板"""
     try:
@@ -359,53 +363,60 @@ def download_dictionary_enum_template(type_id: int, db: Session = Depends(get_db
         import io
         import openpyxl
         from openpyxl.styles import Font, Alignment, PatternFill
-        
+
         # 检查字典类型是否存在
         dictionary_type = dictionary_type_crud.get(db, type_id)
         if not dictionary_type:
             raise HTTPException(status_code=404, detail="字典类型不存在")
-        
+
         # 创建Excel工作簿
         wb = openpyxl.Workbook()
         ws = wb.active
         # 清理工作表名称，移除不允许的字符
-        safe_name = dictionary_type.name.replace('/', '_').replace('\\', '_').replace('*', '_').replace('?', '_').replace('[', '_').replace(']', '_')
+        safe_name = (
+            dictionary_type.name.replace("/", "_")
+            .replace("\\", "_")
+            .replace("*", "_")
+            .replace("?", "_")
+            .replace("[", "_")
+            .replace("]", "_")
+        )
         ws.title = f"{safe_name}导入模板"
-        
+
         # 设置标题行
         headers = ["枚举编码", "枚举名称", "排序", "父级编码", "层级"]
         for col, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = Font(bold=True, color="FFFFFF")
-            cell.fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+            cell.fill = PatternFill(
+                start_color="366092", end_color="366092", fill_type="solid"
+            )
             cell.alignment = Alignment(horizontal="center", vertical="center")
-        
+
         # 设置所有列都一样宽
         for col in range(1, len(headers) + 1):
             ws.column_dimensions[openpyxl.utils.get_column_letter(col)].width = 15
-        
+
         # 添加简单示例数据
-        example_data = [
-            ["cy", "乘用车", 1, "", 1],
-            ["cy_sedan", "轿车", 1, "cy", 2]
-        ]
-        
+        example_data = [["cy", "乘用车", 1, "", 1], ["cy_sedan", "轿车", 1, "cy", 2]]
+
         for row, data in enumerate(example_data, 2):
             for col, value in enumerate(data, 1):
                 cell = ws.cell(row=row, column=col, value=value)
                 cell.alignment = Alignment(horizontal="left", vertical="center")
-        
+
         # 保存到内存
         output = io.BytesIO()
         wb.save(output)
         output.seek(0)
-        
+
         # 返回文件流
         filename = f"{dictionary_type.name}_导入模板.xlsx"
         # 对文件名进行URL编码以支持中文
         import urllib.parse
-        encoded_filename = urllib.parse.quote(filename.encode('utf-8'))
-        
+
+        encoded_filename = urllib.parse.quote(filename.encode("utf-8"))
+
         return StreamingResponse(
             io.BytesIO(output.read()),
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -416,8 +427,8 @@ def download_dictionary_enum_template(type_id: int, db: Session = Depends(get_db
                 "Pragma": "no-cache",
                 "Expires": "0",
                 "X-Content-Type-Options": "nosniff",
-                "X-Download-Options": "noopen"
-            }
+                "X-Download-Options": "noopen",
+            },
         )
     except HTTPException:
         raise

@@ -1,20 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
-from app.core.auth import verify_password
+from app.core.auth import authenticate_user, create_access_token, verify_password
 from app.core.database import get_db
 from app.core.deps import get_current_active_user, get_current_superuser
 from app.core.exceptions import (
+    InvalidCredentialsError,
     SuperAdminOperationError,
     UserAlreadyExistsError,
+    UserDisabledError,
     UserNotFoundError,
 )
+from app.core.messages import Messages
 from app.crud.user import user_crud
 from app.models.user import User
-from app.schemas.base import ApiResponse, CamelCaseModel
+from app.schemas.base import ApiResponse, CamelCaseModel, Token
 from app.schemas.user import (
+    LoginResponse,
     UserCreate,
     UserForgetPassword,
+    UserLogin,
     UserRegister,
     UserResponse,
     UserUpdate,
@@ -26,6 +31,22 @@ router = APIRouter()
 class ChangePasswordRequest(CamelCaseModel):
     currentPassword: str
     newPassword: str
+
+
+@router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
+def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
+    """用户登录"""
+    user = authenticate_user(db, user_credentials.user_name, user_credentials.password)
+    if not user:
+        raise InvalidCredentialsError()
+
+    if not user.status:
+        raise UserDisabledError()
+
+    access_token = create_access_token(data={"sub": str(user.id)})
+    return LoginResponse(
+        message=Messages.USER_LOGIN_SUCCESS, data=Token(access_token=access_token)
+    )
 
 
 @router.get("/me", response_model=ApiResponse)
