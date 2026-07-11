@@ -88,7 +88,7 @@ def update_current_user_info(
     )
 
 
-@router.put("/me/change-password", response_model=ApiResponse)
+@router.put("/me/change", response_model=ApiResponse)
 def change_current_user_password(
     password_request: ChangePasswordRequest,
     current_user: User = Depends(get_current_active_user),
@@ -157,9 +157,9 @@ def get_users(
 
     # 预加载角色、部门成员和部门负责人信息
     query = query.options(
-        joinedload(User.roles), 
+        joinedload(User.roles),
         joinedload(User.departments),
-        joinedload(User.leading_departments)
+        joinedload(User.leading_departments),
     )
 
     # 获取总数
@@ -334,7 +334,7 @@ def delete_user(
     return ApiResponse(message="用户删除成功")
 
 
-@router.post("/forget-password", response_model=ApiResponse)
+@router.post("/forget", response_model=ApiResponse)
 def forget_password(data: UserForgetPassword, db: Session = Depends(get_db)):
     """忘记密码重置"""
     from app.core.messages import success_response
